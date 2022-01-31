@@ -27,6 +27,8 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+GoTo: http://localhost:3005 - UI
+
 ## License
 
 [Apache2 licensed](LICENSE).
