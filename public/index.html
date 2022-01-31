@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <script>
+      let wallet, token;
+      const connect = () => {
+        window.rabet.connect().then((w) => (wallet = w));
+      };
+
+      const send = () => {
+        const xdr = document.getElementById('xdr');
+        fetch('http://localhost:3005/auth?account=' + wallet.publicKey)
+          .then((res) => res.json())
+          .then((res) => {
+            xdr.value = res.transaction
+          });
+      };
+
+      const getSecuredContent = () => {
+        const xdr = document.getElementById('xdr');
+        fetch('http://localhost:3005/api/securedContent', {
+          headers:{
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then((res) => res.json())
+          .then((res) => (xdr.value = JSON.stringify(res)))
+          .catch(err => (xdr.value = String(err)))
+      };
+
+      const sign = () => {
+        const xdr = document.getElementById('xdr');
+        window.rabet
+          .sign(xdr.value, 'Public Global Stellar Network ; September 2015')
+          .then((res) => {
+            fetch(
+                'http://localhost:3005/auth',
+                {
+                  method: 'POST',
+                  headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ transaction: res.xdr }),
+                }
+              )
+              .then((res) => res.json())
+              .then((res) => {
+                xdr.value = res.token
+                token = res.token
+              });
+          });
+      };
+    </script>
+
+    <h1>Wellcome to SEP-10 example implementation, for this UI test you require to install <a href="https://rabet.io/download">Rabet wallet</a></h1>
+    <ol>
+        <li>Connect and accept wallet on this page</li>
+        <li>Send auth with Stellar wallet request</li>
+        <li>Sign and send signed XDR to the SEP-10 server</li>
+        <li>Now you'll receive JWT Auth bearer token for future activity</li>
+    </ol>
+    <textarea cols="100" rows="20" id="xdr"></textarea>
+    <button onclick="connect()">1. Connect</button>
+    <button onclick="send()">2. Send</button>
+    <button onclick="sign()">3. Sign</button>
+    <button onclick="getSecuredContent()">4. Request secured content</button>
+  </body>
+</html>

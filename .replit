@@ -1,0 +1,2 @@
+language = "nodejs"
+run = "cp .env.example .env && npm start"
