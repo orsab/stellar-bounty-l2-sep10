@@ -16,7 +16,7 @@
 
       const send = () => {
         const xdr = document.getElementById('xdr');
-        fetch('http://localhost:3005/auth?account=' + wallet.publicKey)
+        fetch('/auth?account=' + wallet.publicKey)
           .then((res) => res.json())
           .then((res) => {
             xdr.value = res.transaction
@@ -25,7 +25,7 @@
 
       const getSecuredContent = () => {
         const xdr = document.getElementById('xdr');
-        fetch('http://localhost:3005/api/securedContent', {
+        fetch('/api/securedContent', {
           headers:{
             Authorization: `Bearer ${token}`
           }
@@ -41,7 +41,7 @@
           .sign(xdr.value, 'Public Global Stellar Network ; September 2015')
           .then((res) => {
             fetch(
-                'http://localhost:3005/auth',
+                '/auth',
                 {
                   method: 'POST',
                   headers: {
