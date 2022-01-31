@@ -14,6 +14,11 @@ $ cp .env.example .env
 $ npm install
 ```
 
+**OR** try it on repl.it
+
+<a href="https://replit.com/@OrAlkin/stellar-bounty-l2-sep10"><img src="https://cdn.freebiesupply.com/logos/large/2x/replit-logo-svg-vector.svg" width="100">
+</a>
+
 ## Running the app
 
 ```bash
