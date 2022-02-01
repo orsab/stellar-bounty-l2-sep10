@@ -9,68 +9,116 @@
 
   <body>
     <script>
-      let wallet, token;
+      let wallet,
+        token,
+        state = { connected: false };
+      
+      const updateState = () => {
+        const connectBtn = document.getElementById('connectBtn')
+        const sendBtn = document.getElementById('sendBtn')
+        const signBtn = document.getElementById('signBtn')
+        const xdr = document.getElementById('xdr');
+        
+        if(state.connected){
+          sendBtn.removeAttribute('disabled')
+          signBtn.removeAttribute('disabled')
+
+          connectBtn.innerText = '1. Disconnect'
+          connectBtn.setAttribute('onclick','disconnect()')
+        }else{
+          token = ''
+          xdr.value = ''
+
+          sendBtn.setAttribute('disabled','disabled')
+          signBtn.setAttribute('disabled','disabled')
+          
+          connectBtn.innerText = '1. Connect'
+          connectBtn.setAttribute('onclick','connect()')
+        }
+      }
+
       const connect = () => {
-        window.rabet.connect().then((w) => (wallet = w));
+        window.rabet.connect().then((w) => {
+          wallet = w
+          state.connected = true
+
+          updateState()
+        });
+      };
+      const disconnect = () => {
+        window.rabet.disconnect().then((w) => {
+          wallet = ''
+          state.connected = false
+
+          updateState()
+        });
       };
 
       const send = () => {
         const xdr = document.getElementById('xdr');
         fetch('/auth?account=' + wallet.publicKey)
-          .then((res) => res.json())
           .then((res) => {
-            xdr.value = res.transaction
-          });
+            if(res.ok){
+              return res.json()
+            }
+            else{
+              throw new Error('Bad address')
+            }
+          })
+          .then((res) => {
+            xdr.value = res.transaction;
+          })
+          .catch((err) => (xdr.value = String(err)));
       };
 
       const getSecuredContent = () => {
         const xdr = document.getElementById('xdr');
         fetch('/api/securedContent', {
-          headers:{
-            Authorization: `Bearer ${token}`
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         })
           .then((res) => res.json())
           .then((res) => (xdr.value = JSON.stringify(res)))
-          .catch(err => (xdr.value = String(err)))
+          .catch((err) => (xdr.value = String(err)));
       };
 
       const sign = () => {
         const xdr = document.getElementById('xdr');
         window.rabet
-          .sign(xdr.value, 'Public Global Stellar Network ; September 2015')
+          .sign(xdr.value, 'testnet')
           .then((res) => {
-            fetch(
-                '/auth',
-                {
-                  method: 'POST',
-                  headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ transaction: res.xdr }),
-                }
-              )
+            fetch('/auth', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ transaction: res.xdr }),
+            })
               .then((res) => res.json())
               .then((res) => {
-                xdr.value = res.token
-                token = res.token
+                xdr.value = res.token;
+                token = res.token;
               });
           });
       };
     </script>
 
-    <h1>Wellcome to SEP-10 example implementation, for this UI test you require to install <a href="https://rabet.io/download">Rabet wallet</a></h1>
+    <h1>
+      Wellcome to SEP-10 example implementation, for this UI test you require to
+      install <a href="https://rabet.io/download">Rabet wallet</a>
+    </h1>
     <ol>
-        <li>Connect and accept wallet on this page</li>
-        <li>Send auth with Stellar wallet request</li>
-        <li>Sign and send signed XDR to the SEP-10 server</li>
-        <li>Now you'll receive JWT Auth bearer token for future activity</li>
+      <li>Connect and accept wallet on this page</li>
+      <li>Send auth with Stellar wallet request</li>
+      <li>Sign and send signed XDR to the SEP-10 server</li>
+      <li>Now you'll receive JWT Auth bearer token for future activity</li>
     </ol>
     <textarea cols="100" rows="20" id="xdr"></textarea>
-    <button onclick="connect()">1. Connect</button>
-    <button onclick="send()">2. Send</button>
-    <button onclick="sign()">3. Sign</button>
+    <button id="connectBtn" onclick="connect()">1. Connect</button>
+    <button disabled id="sendBtn" onclick="send()">2. Send</button>
+    <button disabled id="signBtn" onclick="sign()">3. Sign</button>
     <button onclick="getSecuredContent()">4. Request secured content</button>
   </body>
 </html>

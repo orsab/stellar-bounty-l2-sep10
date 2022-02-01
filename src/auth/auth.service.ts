@@ -96,9 +96,26 @@ export class AuthService {
     let client_domain
     const tx = parsed.tx
 
-    assert.ok(tx.signatures.length === 2, 'Not signed transaction received')
-    assert.ok(this.checkSourceTransaction(tx), 'Bad transaction source account')
     const [firstOperation] = tx.operations
+
+    // Signatures check: 
+    // 1. exact 2 signatures
+    // 2. custodian wallet signature
+    // 3. customer wallet signature
+    assert.ok(tx.signatures.length === 2, 'Not signed transaction received')
+    const custodianKeyPair = sdk.Keypair.fromSecret(this.configService.get('custodian'))
+    const customerKeyPair = sdk.Keypair.fromPublicKey(firstOperation.source)
+
+    assert.ok(tx.signatures.some(s => {
+      const match = custodianKeyPair.verify(tx.hash(), s._attributes.signature)
+      return match
+    }), 'Signature of custodian account not match')
+    assert.ok(tx.signatures.some(s => {
+      const match = customerKeyPair.verify(tx.hash(), s._attributes.signature)
+      return match
+    }), 'Signature of customer account not match')
+
+    assert.ok(this.checkSourceTransaction(tx), 'Bad transaction source account')
     assert.ok(this.checkFirstOperation(firstOperation), 'First operation source account does not exist')
 
     const foundManagedData = tx.operations.find(o => o.type === 'manageData' && o.name === 'client_domain')
