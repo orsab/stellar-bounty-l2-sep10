@@ -10,11 +10,11 @@ export class AppService {
   }
 
   genTomlFile(): string {
-    return `VERSION=${this.configService.get('toml.VERSION')}
+    return `VERSION = "${this.configService.get('toml.VERSION')}"
 
-NETWORK_PASSPHRASE=${this.configService.get('toml.NETWORK_PASSPHRASE')}
-SIGNING_KEY=${this.configService.get('toml.SIGNING_KEY')}
-WEB_AUTH_ENDPOINT=${this.configService.get('toml.WEB_AUTH_ENDPOINT')}
+NETWORK_PASSPHRASE = "${this.configService.get('toml.NETWORK_PASSPHRASE')}"
+SIGNING_KEY = "${this.configService.get('toml.SIGNING_KEY')}"
+WEB_AUTH_ENDPOINT = "${this.configService.get('toml.WEB_AUTH_ENDPOINT')}"
 `
   }
 }
