@@ -15,7 +15,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/api/securedContent')
+  @Get('/info')
   async securedContent(@Request() req, @Response() res) {
     const sdk = Stellar.getInstance()
     if(!sdk.validateAddress(req.user.accountId)){
