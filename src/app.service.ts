@@ -15,7 +15,7 @@ export class AppService {
 NETWORK_PASSPHRASE = "${this.configService.get('toml.NETWORK_PASSPHRASE')}"
 SIGNING_KEY = "${this.configService.get('toml.SIGNING_KEY')}"
 WEB_AUTH_ENDPOINT = "${this.configService.get('toml.WEB_AUTH_ENDPOINT')}"
-TRANSFER_SERVER = "${this.configService.get('toml.WEB_AUTH_ENDPOINT')}/sep6"
+TRANSFER_SERVER = "${this.configService.get('toml.TRANSFER_SERVER')}"
 `
   }
 }
