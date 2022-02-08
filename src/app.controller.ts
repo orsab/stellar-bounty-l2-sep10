@@ -7,7 +7,7 @@ import Stellar from './util/stellar'
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/.whell-known/stellar.toml')
+  @Get('/.well-known/stellar.toml')
   @Header('Content-Type', 'text/plain')
   @Header('access-control-allow-origin', '*')
   toml(): string {
